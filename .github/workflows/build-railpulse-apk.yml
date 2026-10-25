@@ -37,7 +37,7 @@ jobs:
         with:
           channel: stable
           cache: true
-          cache-dependency-path: app_clone/pubspec.lock
+          cache-key: railpulse-${{ hashFiles('app_clone/pubspec.lock') }}
 
       - name: Resolve Flutter dependencies
         working-directory: app_clone
