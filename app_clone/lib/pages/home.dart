@@ -3,6 +3,7 @@ import 'package:app_clone/pages/express.dart';
 import 'package:app_clone/pages/metro.dart';
 import 'package:app_clone/pages/pnr.dart';
 import 'package:app_clone/pages/tickets.dart';
+import 'package:app_clone/pages/cell_tower_status.dart';
 import 'package:flutter/material.dart';
 import 'package:app_clone/utils/colors.dart';
 
@@ -19,7 +20,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   int selectBottomNavIndex = 0;
   PageController bottomNavPageController = PageController();
 
-  // Tab Controller Functionality
   @override
   void initState() {
     super.initState();
@@ -29,10 +29,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   @override
   void dispose() {
     _tabController.dispose();
+    bottomNavPageController.dispose();
     super.dispose();
   }
 
-  // Bottom Navigation Funcionality
   void onTapBottomNavItem(int index) {
     setState(() {
       selectBottomNavIndex = index;
@@ -48,14 +48,29 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              "Where is my Train",
+            const Text(
+              "RailPulse",
               style: TextStyle(
-                color: AppColors.appBarFontColor,
-                fontWeight: FontWeight.w400,
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.2,
               ),
             ),
-            Icon(Icons.mic, size: 28, color: AppColors.appBarFontColor),
+            Row(
+              children: [
+                IconButton(
+                  tooltip: 'Cell tower tracking',
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const CellTowerStatusPage()),
+                    );
+                  },
+                  icon: Icon(Icons.cell_tower, size: 25, color: AppColors.appBarFontColor),
+                ),
+                Icon(Icons.mic, size: 28, color: AppColors.appBarFontColor),
+              ],
+            ),
           ],
         ),
         backgroundColor: AppColors.appbarColor,
@@ -80,14 +95,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                 ),
                 labelColor: Colors.white,
                 unselectedLabelColor: Colors.white70,
-                labelStyle: TextStyle(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 18,
-                ),
-                tabs: [
-                  Tab(text: "EXPRESS"),
-                  Tab(text: "METRO"),
-                ],
+                labelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
+                tabs: const [Tab(text: "EXPRESS"), Tab(text: "METRO")],
                 indicatorSize: TabBarIndicatorSize.tab,
                 dividerHeight: 0,
               ),
@@ -96,10 +105,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           Expanded(
             child: TabBarView(
               controller: _tabController,
-              children: [
-                Center(child: ExpressPage()),
-                Center(child: MetroPage()),
-              ],
+              children: const [Center(child: ExpressPage()), Center(child: MetroPage())],
             ),
           ),
         ],
@@ -113,49 +119,31 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           children: [
             TextButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => PNRPage()),
-                );
+                Navigator.push(context, MaterialPageRoute(builder: (context) => PNRPage()));
               },
-              child: Row(
+              child: const Row(
                 children: [
                   Icon(Icons.search, color: Colors.white, size: 24),
                   SizedBox(width: 6),
-                  Text(
-                    "PNR",
-                    style: TextStyle(color: Colors.white, fontSize: 19),
-                  ),
+                  Text("PNR", style: TextStyle(color: Colors.white, fontSize: 19)),
                 ],
               ),
             ),
             Container(
-              margin: EdgeInsets.only(
-                left: MediaQuery.of(context).size.height * 0.03,
-              ),
-              color: Colors.grey.shade500,
+              margin: EdgeInsets.only(left: MediaQuery.of(context).size.height * 0.03),
+              color: Colors.grey,
               width: 1,
               height: MediaQuery.of(context).size.width,
             ),
             TextButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => TicketsPage()),
-                );
+                Navigator.push(context, MaterialPageRoute(builder: (context) => TicketsPage()));
               },
-              child: Row(
+              child: const Row(
                 children: [
-                  Icon(
-                    Icons.confirmation_num_outlined,
-                    color: Colors.white,
-                    size: 24,
-                  ),
+                  Icon(Icons.confirmation_num_outlined, color: Colors.white, size: 24),
                   SizedBox(width: 6),
-                  Text(
-                    "Tickets",
-                    style: TextStyle(color: Colors.white, fontSize: 19),
-                  ),
+                  Text("Tickets", style: TextStyle(color: Colors.white, fontSize: 19)),
                 ],
               ),
             ),
