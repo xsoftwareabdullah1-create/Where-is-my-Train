@@ -68,3 +68,17 @@ If you found this project helpful or have any suggestions, feel free to connect:
 This project is licensed under the [MIT License](LICENSE).
 
 ### Thankyou
+
+
+## Cell-tower tracking and offline-status roadmap
+
+The `feature/cell-tower-offline-status` branch adds an Android cell-information reader and a dedicated UI entry point. Android can report cell identifiers and signal strength when the device and carrier expose them and the user grants the requested permissions.
+
+**Important limitations**
+- A cell ID is not a latitude/longitude. A tower-coordinate dataset is required before cell IDs can be mapped to places or matched to a railway route.
+- Cell coverage can span a large area, so cell-only train positions must be estimates and confidence must reflect actual evidence. No location or confidence is fabricated when tower coordinates are missing.
+- The current app is a Flutter UI clone; it does not yet include an authoritative live running-status provider or a bundled offline train timetable/route database. Therefore an accurate current `On time` / `Late` result cannot be produced offline yet.
+- A safe offline-first design should cache the last real status with its timestamp, ship a licensed route/timetable dataset, and label schedule-derived estimates separately from live railway data.
+- GPS is optional and should be used only with the user's permission as a cross-check.
+
+The new Cell Tower Tracking screen currently reads device cell information only. Railway location matching, the offline timetable database, live delay source, and persisted last-known status are follow-up integrations, not claimed as implemented.
