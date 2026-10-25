@@ -48,11 +48,12 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              "Where is my Train",
+            const Text(
+              "RailPulse",
               style: TextStyle(
-                color: AppColors.appBarFontColor,
-                fontWeight: FontWeight.w400,
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.2,
               ),
             ),
             Row(
