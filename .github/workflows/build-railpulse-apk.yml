@@ -2,12 +2,8 @@ name: Build RailPulse Android APK
 
 on:
   push:
-    branches:
-      - main
-      - feature/cell-tower-offline-status
+    branches: [main, master]
   pull_request:
-    branches:
-      - main
   workflow_dispatch:
 
 permissions:
@@ -18,43 +14,70 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-apk:
+  build:
     name: Build release APK
-    runs-on: ubuntu-latest
-    timeout-minutes: 35
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    defaults:
+      run:
+        working-directory: app_clone
+
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: "17"
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
-          cache-key: railpulse-${{ hashFiles('app_clone/pubspec.lock') }}
+          cache-key: railpulse-${{ runner.os }}
+
+      # ROOT-CAUSE FIX: the build failed with
+      #   "Your project's Kotlin version (2.1.0) is lower than Flutter's
+      #    minimum supported version of 2.2.20."
+      # This bumps the Kotlin Gradle plugin in CI. Make the same change
+      # permanently in app_clone/android/settings.gradle (or .kts) and this
+      # step becomes a harmless no-op.
+      - name: Upgrade Kotlin Gradle plugin to 2.2.20
+        working-directory: app_clone/android
+        run: |
+          for f in settings.gradle settings.gradle.kts; do
+            if [ -f "$f" ]; then
+              sed -E -i "s/(org\.jetbrains\.kotlin\.android[\"')]* +version +[\"'])[0-9]+\.[0-9]+\.[0-9]+/\12.2.20/" "$f"
+              echo "--- $f ---"
+              grep -n "kotlin" "$f" || true
+            fi
+          done
+          # Older templates keep the version in build.gradle instead
+          if [ -f build.gradle ]; then
+            sed -E -i "s/(ext\.kotlin_version *= *[\"'])[0-9]+\.[0-9]+\.[0-9]+/\12.2.20/" build.gradle
+          fi
 
       - name: Resolve Flutter dependencies
-        working-directory: app_clone
         run: flutter pub get
 
       - name: Run Flutter tests
-        working-directory: app_clone
         run: flutter test
 
       - name: Build release APK
-        working-directory: app_clone
-        run: flutter build apk --release --build-name=1.0.0 --build-number=${{ github.run_number }}
+        run: >
+          flutter build apk --release
+          --build-name=1.0.0
+          --build-number=${{ github.run_number }}
 
-      - name: Upload APK artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: RailPulse-android-apk
+          name: RailPulse-release-apk
           path: app_clone/build/app/outputs/flutter-apk/app-release.apk
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 30
+          
